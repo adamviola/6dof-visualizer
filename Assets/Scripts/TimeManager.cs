@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 public class TimeManager : MonoBehaviour
 {
-
+    public RectTransform content;
     public GameObject slot;
     public GameObject trace;
     public Button uploadButton;
@@ -170,6 +170,8 @@ public class TimeManager : MonoBehaviour
 
 
         numUploaded++;
+
+        this.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, numUploaded * 20);
     }
 
     public void DeleteTrace(GameObject trace) {
