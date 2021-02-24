@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 public class TimeManager : MonoBehaviour
 {
 
+    public GameObject slot;
     public GameObject trace;
     public Button uploadButton;
     public Button pauseButton;
@@ -16,6 +17,7 @@ public class TimeManager : MonoBehaviour
     public Text timeText;
     public Slider timeline;
     public RectTransform timelineRectTransform;
+    public Dictionary<GameObject, float> traceLengths;
 
 
     float speed = 1f;
@@ -23,10 +25,12 @@ public class TimeManager : MonoBehaviour
     public float time = 0;
     float maxTime = 1;
     bool dragging = false;
+    int numUploaded = 0;
 
     // Start is called before the first frame update
     void Start()
     {
+        traceLengths = new Dictionary<GameObject, float>();
         pauseButton.onClick.AddListener(OnPauseClicked);
         speedButton.onClick.AddListener(OnSpeedClicked);
     }
@@ -46,6 +50,9 @@ public class TimeManager : MonoBehaviour
         }
 
         ((RectTransform)timeline.transform).SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width - 40);
+
+
+        timeText.text = (int) time / 60 + ":" + ((int) time % 60 < 10 ? "0" : "") + (int)time % 60 + " / " + (int) maxTime / 60 + ":" + ((int) maxTime % 60 < 10 ? "0" : "") + (int)maxTime % 60;
     }
 
     public void OnTimelineDown() {
@@ -69,7 +76,7 @@ public class TimeManager : MonoBehaviour
 
     void SetPaused(bool paused) {
         this.paused = paused;
-        pauseText.text = paused ? "Pl" : "| |";
+        pauseText.text = paused ? ">" : "| |";
     }
 
 
@@ -151,10 +158,34 @@ public class TimeManager : MonoBehaviour
 
         GameObject trace = GameObject.Instantiate(this.trace);
         trace.SetActive(true);
-
         trace.GetComponent<Trace>().Init(times, positions, rotations);
 
+        traceLengths.Add(trace, lastTime);
 
+        GameObject slot = GameObject.Instantiate(this.slot, this.slot.transform.parent);
+        slot.GetComponent<Slot>().trace = trace.GetComponent<Trace>();
+        slot.SetActive(true);
+
+        ((RectTransform) slot.transform).anchoredPosition += new Vector2(0, -20 * numUploaded);
+
+
+        numUploaded++;
+    }
+
+    public void DeleteTrace(GameObject trace) {
+        float length = traceLengths[trace];
+        traceLengths.Remove(trace);
+
+        if (Mathf.Approximately(maxTime, length)) {
+            float newMax = 1;
+            foreach(float l in traceLengths.Values) {
+                if (l > newMax) {
+                    newMax = l;
+                }
+            }
+            maxTime = newMax;
+            timeline.value = time / maxTime;
+        }
     }
 
 

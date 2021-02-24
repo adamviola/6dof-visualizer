@@ -11,7 +11,7 @@ public class Trace : MonoBehaviour
     float[] times;
     Vector3[] positions;
     Quaternion[] rotations;
-    LineRenderer line;
+    public LineRenderer line;
 
     int lastCount = 0;
     
