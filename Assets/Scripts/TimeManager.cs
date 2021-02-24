@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Newtonsoft.Json.Linq;
 
 public class TimeManager : MonoBehaviour
 {
@@ -94,24 +95,53 @@ public class TimeManager : MonoBehaviour
     }
 
     public void AddTrace(string content) {
-        string[] lines = content.Split('\n');
-        int length = lines.Length - 1;
+        // string[] lines = content.Split('\n');
+        // int length = lines.Length - 1;
 
+        
+
+        // char[] ends = new char[]{'[', ']'};
+        // for (int i = 0; i < length; i++) {
+        //     string line = lines[i].Trim(ends);
+        //     string[] cols = line.Split(',');
+
+        //     times[i] = StoF(cols[2]);
+        //     positions[i] = new Vector3(StoF(cols[3]), StoF(cols[4]), StoF(cols[5]));
+
+        //     rotations[i] = Quaternion.Euler(StoF(cols[6]), StoF(cols[7]), StoF(cols[8]));
+        // }
+
+        JObject json = JObject.Parse(content);
+
+        int length = ((JObject)json["ts"]).Count;
         float[] times = new float[length];
         Vector3[] positions = new Vector3[length];
         Quaternion[] rotations = new Quaternion[length];
+        
+        IEnumerator<JToken> timeEnumerator = json["ts"].Children().GetEnumerator();
+        IEnumerator<JToken> xEnumerator = json["x"].Children().GetEnumerator();
+        IEnumerator<JToken> yEnumerator = json["y"].Children().GetEnumerator();
+        IEnumerator<JToken> zEnumerator = json["z"].Children().GetEnumerator();
+        IEnumerator<JToken> rollEnumerator = json["roll"].Children().GetEnumerator();
+        IEnumerator<JToken> pitchEnumerator = json["pitch"].Children().GetEnumerator();
+        IEnumerator<JToken> yawEnumerator = json["yaw"].Children().GetEnumerator();
 
-        char[] ends = new char[]{'[', ']'};
+
         for (int i = 0; i < length; i++) {
-            string line = lines[i].Trim(ends);
-            string[] cols = line.Split(',');
+            timeEnumerator.MoveNext();
+            xEnumerator.MoveNext();
+            yEnumerator.MoveNext();
+            zEnumerator.MoveNext();
+            rollEnumerator.MoveNext();
+            pitchEnumerator.MoveNext();
+            yawEnumerator.MoveNext();
 
-            times[i] = StoF(cols[2]);
-            positions[i] = new Vector3(StoF(cols[3]), StoF(cols[4]), StoF(cols[5]));
 
-            rotations[i] = Quaternion.Euler(StoF(cols[6]), StoF(cols[7]), StoF(cols[8]));
-        }
+            times[i] = timeEnumerator.Current.First.Value<float>();
+            positions[i] = new Vector3(xEnumerator.Current.First.Value<float>(), yEnumerator.Current.First.Value<float>(), zEnumerator.Current.First.Value<float>());
+            rotations[i] = Quaternion.Euler(rollEnumerator.Current.First.Value<float>(), pitchEnumerator.Current.First.Value<float>(), yawEnumerator.Current.First.Value<float>());
 
+        }   
 
         float lastTime = times[times.Length - 1];
         if (lastTime > maxTime) {
@@ -123,6 +153,8 @@ public class TimeManager : MonoBehaviour
         trace.SetActive(true);
 
         trace.GetComponent<Trace>().Init(times, positions, rotations);
+
+
     }
 
 
