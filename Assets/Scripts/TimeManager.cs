@@ -23,7 +23,7 @@ public class TimeManager : MonoBehaviour
     float speed = 1f;
     bool paused = true;
     public float time = 0;
-    float maxTime = 1;
+    public float maxTime = 1;
     bool dragging = false;
     int numUploaded = 0;
 
@@ -118,37 +118,10 @@ public class TimeManager : MonoBehaviour
         //     rotations[i] = Quaternion.Euler(StoF(cols[6]), StoF(cols[7]), StoF(cols[8]));
         // }
 
-        JObject json = JObject.Parse(content);
-
-        int length = ((JObject)json["ts"]).Count;
-        float[] times = new float[length];
-        Vector3[] positions = new Vector3[length];
-        Quaternion[] rotations = new Quaternion[length];
-        
-        IEnumerator<JToken> timeEnumerator = json["ts"].Children().GetEnumerator();
-        IEnumerator<JToken> xEnumerator = json["x"].Children().GetEnumerator();
-        IEnumerator<JToken> yEnumerator = json["y"].Children().GetEnumerator();
-        IEnumerator<JToken> zEnumerator = json["z"].Children().GetEnumerator();
-        IEnumerator<JToken> rollEnumerator = json["roll"].Children().GetEnumerator();
-        IEnumerator<JToken> pitchEnumerator = json["pitch"].Children().GetEnumerator();
-        IEnumerator<JToken> yawEnumerator = json["yaw"].Children().GetEnumerator();
-
-
-        for (int i = 0; i < length; i++) {
-            timeEnumerator.MoveNext();
-            xEnumerator.MoveNext();
-            yEnumerator.MoveNext();
-            zEnumerator.MoveNext();
-            rollEnumerator.MoveNext();
-            pitchEnumerator.MoveNext();
-            yawEnumerator.MoveNext();
-
-
-            times[i] = timeEnumerator.Current.First.Value<float>();
-            positions[i] = new Vector3(xEnumerator.Current.First.Value<float>(), yEnumerator.Current.First.Value<float>(), zEnumerator.Current.First.Value<float>());
-            rotations[i] = Quaternion.Euler(rollEnumerator.Current.First.Value<float>(), pitchEnumerator.Current.First.Value<float>(), yawEnumerator.Current.First.Value<float>());
-
-        }   
+        (float[], Vector3[], Quaternion[]) parsedContent = FileChooser.ParseData(content);
+        float[] times = parsedContent.Item1;
+        Vector3[] positions = parsedContent.Item2;
+        Quaternion[] rotations = parsedContent.Item3;
 
         float lastTime = times[times.Length - 1];
         if (lastTime > maxTime) {

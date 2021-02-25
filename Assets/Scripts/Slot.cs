@@ -14,6 +14,7 @@ public class Slot : MonoBehaviour
     public Trace trace;
     public Button colorButton;
     public Toggle visibilityToggle;
+    public Text text;
 
     int colorIndex = -1;
 
@@ -22,7 +23,7 @@ public class Slot : MonoBehaviour
         OnClickColor();
     }
 
-    public void OnToggleVisibility(bool value) {
+    public void OnToggleVisibility() {
         trace.gameObject.SetActive(visibilityToggle.isOn);
     }
 
