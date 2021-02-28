@@ -51,17 +51,11 @@ public class SceneManager : MonoBehaviour
             currentScene.SetActive(true);
         }
 
-        // TextAsset[] data = Resources.LoadAll<TextAsset>(scene);
         requests = 50;
         for (int i = 1; i <= 50; i++) {
             ResourceRequest request = Resources.LoadAsync<TextAsset>(scene + "/" + i);
             request.completed += CompletedRequest;
         }
-
-        
-        
-
-        
     }
 
     void CompletedRequest(AsyncOperation op) {
