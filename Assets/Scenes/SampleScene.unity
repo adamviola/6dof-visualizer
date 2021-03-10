@@ -3418,7 +3418,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 1362284669}
-  line: {fileID: 0}
+  line: {fileID: 1013214067}
+  cube: {fileID: 1013214069}
+  quad1: {fileID: 2013690706}
+  quad2: {fileID: 1253346625}
 --- !u!1 &1021906675
 GameObject:
   m_ObjectHideFlags: 0
@@ -4109,7 +4112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 1362284669}
-  trace: {fileID: 0}
+  traces: []
   colorButton: {fileID: 875826917}
   visibilityToggle: {fileID: 1729209747}
   text: {fileID: 0}
@@ -5740,7 +5743,7 @@ MonoBehaviour:
       - m_Target: {fileID: 1233174691}
         m_TargetAssemblyTypeName: Slot, Assembly-CSharp
         m_MethodName: OnToggleVisibility
-        m_Mode: 6
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -5892,7 +5895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 1362284669}
-  trace: {fileID: 0}
+  traces: []
   colorButton: {fileID: 120230113}
   visibilityToggle: {fileID: 1189766687}
   text: {fileID: 2059218813}

@@ -13,6 +13,10 @@ public class Trace : MonoBehaviour
     Quaternion[] rotations;
     public LineRenderer line;
 
+    public MeshRenderer cube;
+    public GameObject quad1;
+    public GameObject quad2;
+
     int lastCount = 0;
     
     public void Init(float[] times, Vector3[] positions, Quaternion[] rotations) {
@@ -32,6 +36,23 @@ public class Trace : MonoBehaviour
     
     void Update()
     {
+        if (manager.time < times[0]) {
+            if (line.enabled) {
+                line.enabled = false;
+                cube.enabled = false;
+                quad1.SetActive(false);
+                quad2.SetActive(false);
+            }
+            return;
+
+        } else if (!line.enabled && manager.time >= times[0]) {
+            line.enabled = true;
+            cube.enabled = true;
+            quad1.SetActive(true);
+            quad2.SetActive(true);
+        }
+
+
         int newCount = Array.BinarySearch(times, manager.time);
 
         if (newCount < 0) {

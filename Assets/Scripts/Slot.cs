@@ -11,7 +11,7 @@ public class Slot : MonoBehaviour
     }
 
     public TimeManager manager;
-    public Trace trace;
+    public Trace[] traces;
     public Button colorButton;
     public Toggle visibilityToggle;
     public Text text;
@@ -24,32 +24,38 @@ public class Slot : MonoBehaviour
     }
 
     public void OnToggleVisibility() {
-        trace.gameObject.SetActive(visibilityToggle.isOn);
+        foreach (Trace trace in traces) {
+            trace.gameObject.SetActive(visibilityToggle.isOn);
+        }
     }
 
     public void OnClickColor() {
         colorIndex = (colorIndex + 1) % colors.Length;
-        Color color = colors[colorIndex];
+        foreach (Trace trace in traces) {
+            Color color = colors[colorIndex];
 
-        // trace.line.material.color =  color;
-        Gradient grad = new Gradient();
-        grad.SetKeys(new GradientColorKey[] {new GradientColorKey(color, 0f)}, new GradientAlphaKey[]{new GradientAlphaKey(1f, 0f)});
-        trace.line.colorGradient = grad;
+            // trace.line.material.color =  color;
+            Gradient grad = new Gradient();
+            grad.SetKeys(new GradientColorKey[] {new GradientColorKey(color, 0f)}, new GradientAlphaKey[]{new GradientAlphaKey(1f, 0f)});
+            trace.line.colorGradient = grad;
 
-        ColorBlock colorBlock = ColorBlock.defaultColorBlock;
-        colorBlock.disabledColor = color;
-        colorBlock.highlightedColor = color;
-        colorBlock.normalColor = color;
-        colorBlock.pressedColor = color;
-        colorBlock.selectedColor = color;
+            ColorBlock colorBlock = ColorBlock.defaultColorBlock;
+            colorBlock.disabledColor = color;
+            colorBlock.highlightedColor = color;
+            colorBlock.normalColor = color;
+            colorBlock.pressedColor = color;
+            colorBlock.selectedColor = color;
 
-        colorButton.colors = colorBlock;
+            colorButton.colors = colorBlock;
+        }
 
     }
 
     public void OnClickDelete() {
-        manager.DeleteTrace(trace.gameObject);
-        GameObject.Destroy(trace.gameObject);
+        foreach (Trace trace in traces) {
+            manager.DeleteTrace(trace.gameObject);
+            GameObject.Destroy(trace.gameObject);
+        }
         GameObject.Destroy(gameObject);
     }
 }

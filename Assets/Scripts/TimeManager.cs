@@ -118,33 +118,44 @@ public class TimeManager : MonoBehaviour
         //     rotations[i] = Quaternion.Euler(StoF(cols[6]), StoF(cols[7]), StoF(cols[8]));
         // }
 
-        (float[], Vector3[], Quaternion[]) parsedContent = FileChooser.ParseData(content);
-        float[] times = parsedContent.Item1;
-        Vector3[] positions = parsedContent.Item2;
-        Quaternion[] rotations = parsedContent.Item3;
+        (float[], Vector3[], Quaternion[])[] parsedContent = FileChooser.ParsePredictions(content);
 
-        float lastTime = times[times.Length - 1];
-        if (lastTime > maxTime) {
-            maxTime = lastTime;
-            timeline.value = time / maxTime;
+        Trace[] traces = new Trace[parsedContent.Length];
+
+        for (int i = 0; i < traces.Length; i++) {
+            (float[], Vector3[], Quaternion[]) parsedTrace = parsedContent[i];
+
+            float[] times = parsedTrace.Item1;
+            Vector3[] positions = parsedTrace.Item2;
+            Quaternion[] rotations = parsedTrace.Item3;
+            
+            float lastTime = times[times.Length - 1];
+            if (lastTime > maxTime) {
+                maxTime = lastTime;
+                timeline.value = time / maxTime;
+            }
+
+            GameObject trace = GameObject.Instantiate(this.trace);
+            trace.SetActive(true);
+            trace.GetComponent<Trace>().Init(times, positions, rotations);
+
+            traces[i] = trace.GetComponent<Trace>();
+
+            traceLengths.Add(trace, lastTime);
         }
 
-        GameObject trace = GameObject.Instantiate(this.trace);
-        trace.SetActive(true);
-        trace.GetComponent<Trace>().Init(times, positions, rotations);
-
-        traceLengths.Add(trace, lastTime);
-
         GameObject slot = GameObject.Instantiate(this.slot, this.slot.transform.parent);
-        slot.GetComponent<Slot>().trace = trace.GetComponent<Trace>();
+        Slot slotScript = slot.GetComponent<Slot>();
+        slotScript.traces = traces;
+        slotScript.OnClickColor();
         slot.SetActive(true);
 
         ((RectTransform) slot.transform).anchoredPosition += new Vector2(0, -20 * numUploaded);
 
-
         numUploaded++;
 
         this.content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, numUploaded * 20);
+        
     }
 
     public void DeleteTrace(GameObject trace) {

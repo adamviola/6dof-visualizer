@@ -77,7 +77,7 @@ public class SceneManager : MonoBehaviour
 
         GameObject slot = GameObject.Instantiate(this.slot, this.slot.transform.parent);
         Slot slotScript = slot.GetComponent<Slot>();
-        slotScript.trace = trace.GetComponent<Trace>();
+        slotScript.traces = new Trace[]{trace.GetComponent<Trace>()};
         slotScript.visibilityToggle.isOn = false;
         slotScript.text.text = content.name;
         slot.SetActive(true);

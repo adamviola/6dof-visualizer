@@ -75,9 +75,54 @@ public class FileChooser : MonoBehaviour
             Vector3 forward = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.forward));
             Vector3 up = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.up));
             rotations[i] = Quaternion.LookRotation(forward, up);
-            
+
+            // Quaternion test = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Quaternion.identity));
+            if (i <= 1) {
+                Debug.Log(Quaternion.LookRotation(forward, up).ToString("F5"));
+                Debug.Log(Quaternion.Angle(Quaternion.LookRotation(forward, up), new Quaternion(-0.002f, 0.606f, 0.202f, 0.770f)));
+            }
         }  
 
         return (times, positions, rotations);
+    }
+
+    public static (float[], Vector3[], Quaternion[])[] ParsePredictions(string data) {
+        JObject json = JObject.Parse(data);
+
+        int numTraces = json.Count;
+        (float[], Vector3[], Quaternion[])[] traces = new (float[], Vector3[], Quaternion[])[numTraces];
+
+        IEnumerator<JToken> frameEnumerator = json.Children().GetEnumerator();
+
+        int index = 0;
+        while (frameEnumerator.MoveNext()) {
+            JObject trace = (JObject) frameEnumerator.Current.First;
+            int length = trace.Count;
+            float[] times = new float[length];
+            Vector3[] positions = new Vector3[length];
+            Quaternion[] rotations = new Quaternion[length];
+
+            for (int i = 0; i < length; i++) {
+                JToken frame = trace[i.ToString()];
+
+                times[i] = frame["ts"].Value<float>();
+                positions[i] = new Vector3(-frame["x"].Value<float>(), frame["y"].Value<float>(), frame["z"].Value<float>());
+                times[i] = frame["ts"].Value<float>();
+                times[i] = frame["ts"].Value<float>();
+
+                float pitch = frame["pitch"].Value<float>();
+                float yaw = frame["yaw"].Value<float>();
+                float roll = frame["roll"].Value<float>(); 
+
+                Vector3 forward = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.forward));
+                Vector3 up = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.up));
+                rotations[i] = Quaternion.LookRotation(forward, up);
+            }
+
+            traces[index] = (times, positions, rotations);
+            index += 1;
+        }
+
+        return traces;
     }
 }
