@@ -86,24 +86,33 @@ public class FileChooser : MonoBehaviour
         return (times, positions, rotations);
     }
 
-    public static (float[], Vector3[], Quaternion[])[] ParsePredictions(string data) {
+    public static ((float[], Vector3[], Quaternion[])[], HashSet<int>) ParsePredictions(string data) {
         JObject json = JObject.Parse(data);
 
         int numTraces = json.Count;
         (float[], Vector3[], Quaternion[])[] traces = new (float[], Vector3[], Quaternion[])[numTraces];
 
-        IEnumerator<JToken> frameEnumerator = json.Children().GetEnumerator();
+        IEnumerator<JToken> traceEnumerator = json.Children().GetEnumerator();
+
+        HashSet<int> gts = new HashSet<int>();
 
         int index = 0;
-        while (frameEnumerator.MoveNext()) {
-            JObject trace = (JObject) frameEnumerator.Current.First;
+        while (traceEnumerator.MoveNext()) {
+            JObject trace = (JObject) traceEnumerator.Current.First;
             int length = trace.Count;
             float[] times = new float[length];
             Vector3[] positions = new Vector3[length];
             Quaternion[] rotations = new Quaternion[length];
 
+            string title = trace.Path;
+            if (title.Contains("gt")) {
+                gts.Add(index);
+            }
+
+            IEnumerator<JToken> frameEnumerator = trace.Children().GetEnumerator();
             for (int i = 0; i < length; i++) {
-                JToken frame = trace[i.ToString()];
+                frameEnumerator.MoveNext();
+                JToken frame = frameEnumerator.Current.First;
 
                 times[i] = frame["ts"].Value<float>();
                 positions[i] = new Vector3(-frame["x"].Value<float>(), frame["y"].Value<float>(), frame["z"].Value<float>());
@@ -123,6 +132,6 @@ public class FileChooser : MonoBehaviour
             index += 1;
         }
 
-        return traces;
+        return (traces, gts);
     }
 }

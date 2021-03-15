@@ -19,6 +19,8 @@ public class TimeManager : MonoBehaviour
     public RectTransform timelineRectTransform;
     public Dictionary<GameObject, float> traceLengths;
 
+    public Material gtMaterial;
+
 
     float speed = 1f;
     bool paused = true;
@@ -118,7 +120,10 @@ public class TimeManager : MonoBehaviour
         //     rotations[i] = Quaternion.Euler(StoF(cols[6]), StoF(cols[7]), StoF(cols[8]));
         // }
 
-        (float[], Vector3[], Quaternion[])[] parsedContent = FileChooser.ParsePredictions(content);
+        ((float[], Vector3[], Quaternion[])[], HashSet<int>) output = FileChooser.ParsePredictions(content);
+
+        (float[], Vector3[], Quaternion[])[] parsedContent = output.Item1;
+        HashSet<int> gts = output.Item2;
 
         Trace[] traces = new Trace[parsedContent.Length];
 
@@ -140,6 +145,17 @@ public class TimeManager : MonoBehaviour
             trace.GetComponent<Trace>().Init(times, positions, rotations);
 
             traces[i] = trace.GetComponent<Trace>();
+
+            if (gts.Contains(i)) {
+                LineRenderer line = trace.GetComponent<LineRenderer>();
+                line.material = gtMaterial;
+                line.startWidth = 0.005f;
+                line.numCapVertices = 0;
+
+                MeshRenderer.Destroy(trace.GetComponent<MeshRenderer>());
+                GameObject.Destroy(trace.transform.GetChild(0).gameObject);
+                GameObject.Destroy(trace.transform.GetChild(1).gameObject);
+            }
 
             traceLengths.Add(trace, lastTime);
         }

@@ -39,17 +39,21 @@ public class Trace : MonoBehaviour
         if (manager.time < times[0]) {
             if (line.enabled) {
                 line.enabled = false;
-                cube.enabled = false;
-                quad1.SetActive(false);
-                quad2.SetActive(false);
+                if (cube != null) {
+                    cube.enabled = false;
+                    quad1.SetActive(false);
+                    quad2.SetActive(false);
+                }
             }
             return;
 
         } else if (!line.enabled && manager.time >= times[0]) {
             line.enabled = true;
-            cube.enabled = true;
+            if (cube != null) {
+                cube.enabled = true;
             quad1.SetActive(true);
             quad2.SetActive(true);
+            }
         }
 
 
