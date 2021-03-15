@@ -6,6 +6,8 @@ var FileReaderPlugin = {
       fileInput.setAttribute('id', 'FileReaderInput');
       fileInput.setAttribute('multiple', 'multiple')
       fileInput.style.visibility = 'hidden';
+      fileInput.style.position = 'absolute';
+      fileInput.style.top = 0;
       fileInput.onclick = function (event) {
         this.value = null;
       };
