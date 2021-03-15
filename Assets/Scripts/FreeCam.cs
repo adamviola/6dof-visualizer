@@ -49,6 +49,16 @@ public class FreeCam : MonoBehaviour
     /// </summary>
     private bool looking = false;
 
+    public SceneManager sceneManager;
+    public TimeManager timeManager;
+
+    private bool cinematic = false;
+    private float cinY = 0;
+    private float cinDist = 0;
+    private float cinAngle = 0;
+    private Vector3 cinTarget = Vector3.zero;
+    private Vector3 cinFocus = Vector3.zero;
+
     void Update()
     {
         var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
@@ -115,6 +125,58 @@ public class FreeCam : MonoBehaviour
         else if (Input.GetKeyUp(KeyCode.Mouse1))
         {
             StopLooking();
+        }
+
+        if (Input.GetKey(KeyCode.C)) {     
+            if (!cinematic) {
+                GameObject scene = sceneManager.currentScene;
+                if (scene == null)
+                    return;
+
+                cinematic = true;
+
+                string sceneName = scene.name;
+                Vector3 focus = Vector3.zero;
+                if (sceneName.Equals("planets")) {
+                    focus = new Vector3(0, 0, -2f);
+                } else if (sceneName.Equals("apples")) {
+                    focus = Vector3.zero;
+                } else if (sceneName.Equals("food")) {
+                    focus = new Vector3(0, 0, -1.5f);
+                } else if (sceneName.Equals("random")) {
+                    focus = Vector3.zero;
+                } else if (sceneName.Equals("bird")) {
+                    focus = new Vector3(0, 0, -0.5f);
+                } else {
+                    focus = Vector3.zero;
+                }
+
+                Vector3 pos = focus - transform.position;
+
+                Vector3 v1 = transform.rotation * Vector3.forward;
+                Vector3 v2 = Vector3.Cross(v1, Vector3.up).normalized;
+
+                float b = (pos.z - pos.x * v1.z / v1.x) / (v2.z - v2.x * v1.z / v1.x);
+                float a = (pos.x - b * v2.x) / v1.x;
+
+                cinFocus = new Vector3(focus.x, a * v1.y + b * v2.y + transform.position.y, focus.z);
+
+                cinY = transform.position.y;
+                pos = transform.position - cinFocus;
+                cinAngle = Mathf.Atan2(pos.z, pos.x);
+                cinDist = Mathf.Sqrt(pos.x * pos.x + pos.z * pos.z);
+
+                timeManager.OnPauseClicked();
+            }       
+        } else if (Input.anyKey) {
+            cinematic = false;
+        }
+
+        if (cinematic) {
+            cinAngle += Time.deltaTime * 0.25f;
+
+            transform.position = new Vector3(cinDist * Mathf.Cos(cinAngle), cinY - cinFocus.y, cinDist * Mathf.Sin(cinAngle)) + cinFocus;
+            transform.rotation = Quaternion.LookRotation(cinFocus - transform.position, Vector3.up);
         }
     }
 

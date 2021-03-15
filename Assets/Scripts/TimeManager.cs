@@ -67,7 +67,7 @@ public class TimeManager : MonoBehaviour
         dragging = false;
     }
 
-    void OnPauseClicked() {
+    public void OnPauseClicked() {
         SetPaused(!paused);
 
         if (time >= maxTime) {
