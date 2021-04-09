@@ -72,8 +72,10 @@ public class FileChooser : MonoBehaviour
             y = yawEnumerator.Current.First.Value<float>();
             z = rollEnumerator.Current.First.Value<float>(); 
 
-            Vector3 forward = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.forward));
-            Vector3 up = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.up));
+            Vector3 forward = (Quaternion.AngleAxis(-y, Vector3.up) * Quaternion.AngleAxis(x, Vector3.right) *  (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.forward));
+            Vector3 up = (Quaternion.AngleAxis(-y, Vector3.up) * Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-z, Vector3.forward) * Vector3.up));
+            // Vector3 forward = Quaternion.AngleAxis(-z, Vector3.forward) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(x, Vector3.right) * Vector3.forward));
+            // Vector3 up = Quaternion.AngleAxis(-z, Vector3.forward) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(x, Vector3.right) * Vector3.up));
             rotations[i] = Quaternion.LookRotation(forward, up);
 
             // Quaternion test = Quaternion.AngleAxis(x, Vector3.right) * (Quaternion.AngleAxis(-y, Vector3.up) * (Quaternion.AngleAxis(-z, Vector3.forward) * Quaternion.identity));
@@ -123,8 +125,10 @@ public class FileChooser : MonoBehaviour
                 float yaw = frame["yaw"].Value<float>();
                 float roll = frame["roll"].Value<float>(); 
 
-                Vector3 forward = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.forward));
-                Vector3 up = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.up));
+                // Vector3 forward = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.forward));
+                // Vector3 up = Quaternion.AngleAxis(pitch, Vector3.right) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(-roll, Vector3.forward) * Vector3.up));
+                Vector3 forward = Quaternion.AngleAxis(-roll, Vector3.forward) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(pitch, Vector3.right) * Vector3.forward));
+                Vector3 up = Quaternion.AngleAxis(-roll, Vector3.forward) * (Quaternion.AngleAxis(-yaw, Vector3.up) * (Quaternion.AngleAxis(pitch, Vector3.right) * Vector3.up));
                 rotations[i] = Quaternion.LookRotation(forward, up);
             }
 
